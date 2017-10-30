@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
 	      puts("Input file cannot be opened.");
 	      exit(0);
 	  }
-	  if ((outputFile = fopen(argv[2], "r+")) == NULL) {
+	  if ((outputFile = fopen(argv[2], "w")) == NULL) {
 	      puts("Output file cannot be opened.");
 	      exit(0);
 	  }
