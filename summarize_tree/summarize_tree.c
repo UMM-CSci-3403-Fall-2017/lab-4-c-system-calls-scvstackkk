@@ -20,9 +20,7 @@ bool is_dir(const char* path) {
     bool is_dir;
     int errcode;
     
-    errcode = stat(path, &buf);
-
-    if (errcode != 0) {
+    if ((errcode = stat(path, &buf)) != 0) {
        printf("stat() returned with error code %d.\n", errcode);
        return 1;
     }
@@ -54,32 +52,34 @@ void process_directory(const char* path) {
     struct dirent* ds;
     int errcode;
     
-    if ((errcode = chdir(path)) != 0) {
-        printf("chdir() returned with error code %d while moving to %s.\n", errcode, path);
-    	return;
-    }
-    else {	
-	if ((current_dir = opendir(path)) == NULL) {
+    // Opens the target directory. Throws an error if the pointer returned is "NULL".
+    if ((current_dir = opendir(path)) == NULL) {
 	    printf("opendir() returned a null pointer while opening %s.\n", path);
 	    return;
-	}	    
-
+    } 
+    else {
+	// Move to the target directory. Throws an error if there are issues.
+        if ((errcode = chdir(path)) != 0) {
+            printf("chdir() returned with error code %d while moving to %s.\n", errcode, path);
+   	    return;
+        }   	    	    
+	// Loop through the contents of the current directory, avoiding "." and "..".
     	while ((ds = readdir(current_dir)) != NULL) {
     	   if (strcmp(ds->d_name, ".") != 0 && strcmp(ds->d_name, "..") != 0) {
     	       process_path(ds->d_name);
 	   } 
 	}
-
+	// Close the current directory or throw an error if there are issues. 
 	if ((errcode = closedir(current_dir)) != 0) {
 	    printf("closedir() returned with error code %d.\n", errcode);
 	    return;
 	}
-
+	// Move out of the current directory. Throwns an error if there are issues.
 	if ((errcode = chdir("..")) != 0) {
 	    printf("chdir() returned with error code %d while moving out of %s.\n", errcode, path);
 	    return;
 	}
-        
+        // Increment the number of directories.
 	++num_dirs;
     }    
 }
