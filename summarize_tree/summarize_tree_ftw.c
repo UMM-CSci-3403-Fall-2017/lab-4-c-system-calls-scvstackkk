@@ -9,14 +9,17 @@
 static int num_dirs, num_regular;
 
 static int callback(const char *fpath, const struct stat *sb, int typeflag) {
+    // Current item in fpath is a file
     if (typeflag == FTW_F) {
     	++num_regular;
 	return 0;
     }
+    // Current item in fpath is a directory
     else if (typeflag == FTW_D) {
     	++num_dirs;
 	return 0;
     }
+    // Callback function terminated with an error, causing ftw() to terminate early.
     else {
     	printf("Error during callback function.\n");
 	return 1;
